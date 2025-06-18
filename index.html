@@ -83,6 +83,7 @@
   <div class="section">
     <label class="label">フォント:</label>
     <div class="radio-group">
+      <label><input type="radio" name="font" value="normal">PC／PL</label>
       <label><input type="radio" name="font" value="unicode">ℙℂ／ℙ𝕃</label>
       <label><input type="radio" name="font" value="square">🅟🅒／🅟🅛</label>
       <label><input type="radio" name="font" value="bold">𝙋𝘾／𝙋𝙇</label>
@@ -174,7 +175,6 @@
           return text.replace(/KP/g, '𝙆𝙋').replace(/GM/g, '𝙂𝙈').replace(/PC/g, '𝙋𝘾').replace(/PL/g, '𝙋𝙇').replace(/HO(\d)/g, '𝙃𝙊$1');
         case 'small':
           return text.replace(/KP/g, 'ᴋᴘ').replace(/GM/g, 'ɢᴍ').replace(/PC/g, 'ᴘᴄ').replace(/PL/g, 'ᴘʟ').replace(/HO(\d)/g, 'ʜᴏ$1').replace(/(\d)/g, (match, digit) => {
-            const smallDigits = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']; // これはHOの添え字には適さないので、一旦そのまま
             return digit;
           });
         case 'circled':
@@ -189,14 +189,14 @@
           });
         case 'script':
           return text.replace(/KP/g, '𝓚𝓟').replace(/GM/g, '𝓖𝓜').replace(/PC/g, '𝓟𝓒').replace(/PL/g, '𝓟𝓛').replace(/HO(\d)/g, '𝓗𝓞$1').replace(/(\d)/g, (match, digit) => {
-            const scriptDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']; // スクリプト体の数字は種類が少ないため、一旦そのまま
-            return scriptDigits[parseInt(digit)];
+            return digit;
           });
         case 'superscript':
           return text.replace(/KP/g, 'ᴷᴾ').replace(/GM/g, 'ᴳᴹ').replace(/PC/g, 'ᴾᶜ').replace(/PL/g, 'ᴾᴸ').replace(/HO(\d)/g, 'ᴴᴼ$1').replace(/(\d)/g, (match, digit) => {
             const superscriptDigits = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
             return superscriptDigits[parseInt(digit)];
           });
+        case 'normal':
         default:
           return text;
       }
@@ -243,33 +243,46 @@
       let pcLabel = "PC：";
       let plLabel = "PL：";
 
-      pcplLabel = transformText(pcplLabel, font);
-      pcLabel = transformText(pcLabel, font);
-      plLabel = transformText(plLabel, font);
+      if (font !== 'normal') {
+        pcplLabel = transformText(pcplLabel, font);
+        pcLabel = transformText(pcLabel, font);
+        plLabel = transformText(plLabel, font);
 
-      for (let i = 0; i < pcplLines.length; i++) {
-        pcplLines[i] = transformText(pcplLines[i], font);
-      }
-      for (let i = 0; i < pcLines.length; i++) {
-        pcLines[i] = transformText(pcLines[i], font);
-      }
-      for (let i = 0; i < plLines.length; i++) {
-        plLines[i] = transformText(plLines[i], font);
-      }
-
-      if (pcplLines.length > 0) {
-        output += pcplLabel + "\n";
-        output += pcplLines.join("\n") + "\n";
+        for (let i = 0; i < pcplLines.length; i++) {
+          pcplLines[i] = transformText(pcplLines[i], font);
+        }
+        for (let i = 0; i < pcLines.length; i++) {
+          pcLines[i] = transformText(pcLines[i], font);
+        }
+        for (let i = 0; i < plLines.length; i++) {
+          plLines[i] = transformText(plLines[i], font);
+        }
       }
 
-      if (pcLines.length > 0) {
-        output += pcLabel + "\n";
-        output += pcLines.join("\n") + "\n";
-      }
+      if (font === 'normal') {
+        if (pcplLines.length > 0) {
+          output += pcplLabel + "\n";
+          for (let i = 0; i < pcplLines.length; i++) {
+            const hoNumber = i + 1;
+            output += `　HO${hoNumber}　${pcplLines[i].split('　')[2]}\n`;
+          }
+          output += "\n";
+        }
+      } else {
+        if (pcplLines.length > 0) {
+          output += pcplLabel + "\n";
+          output += pcplLines.join("\n") + "\n";
+        }
 
-      if (plLines.length > 0) {
-        output += plLabel + "\n";
-        output += plLines.join("\n") + "\n";
+        if (pcLines.length > 0) {
+          output += pcLabel + "\n";
+          output += pcLines.join("\n") + "\n";
+        }
+
+        if (plLines.length > 0) {
+          output += plLabel + "\n";
+          output += plLines.join("\n") + "\n";
+        }
       }
 
       const ending = document.querySelector('input[name=ending]:checked')?.value;
