@@ -86,7 +86,7 @@
       <label><input type="radio" name="font" value="normal">PC／PL</label>
       <label><input type="radio" name="font" value="unicode">ℙℂ／ℙ𝕃</label>
       <label><input type="radio" name="font" value="square">🅟🅒／🅟🅛</label>
-      <label><input type="radio" name="font" value="bold">𝙋𝘾／𝙋𝙇</label>
+      <label><input type="radio" name="font" value="bold">𝙋𝙲／𝙋𝙇</label>
       <label><input type="radio" name="font" value="small">ᴘᴄ／ᴘʟ</label>
       <label><input type="radio" name="font" value="circled">🅿🅲／🅿🅻</label>
       <label><input type="radio" name="font" value="serif">𝙿𝙲／𝙿𝙻</label>
@@ -139,8 +139,7 @@
     function decorateScenario(frame, name) {
       switch (frame) {
         case '「」': return `　　「${name}」`;
-        case '『』': return `　　『${name}』`;
-        case '【】': return `　　【${name}】`;
+        case '『』': return `　　【${name}】`;
         case '──────': return `────────────────────\n　　${name}\n────────────────────`;
         case '◤◢': return `　　◤　${name}　◢`;
         case '╋━━━━━━━━': return `╋━━━━━━━━\n　　${name}\n　　　　　　━━━━━━━━╋`;
@@ -217,6 +216,9 @@
       if (scenarioName) output += decorateScenario(scenarioFrame, scenarioName) + "\n\n";
 
       let roleOutput = `${roleLabel}：${roleName}`;
+      if (roleType === 'GM') {
+        roleOutput = roleOutput.replace(/KP/g, 'GM');
+      }
       roleOutput = transformText(roleOutput, font);
       if (roleLabel && roleName) output += `${roleOutput}\n\n`;
 
@@ -226,9 +228,9 @@
 
       for (let i = 1; i <= 4; i++) {
         const ho = document.getElementById(`ho${i}`).value;
-        const hoLabel = ho ? `HO${ho}` : `HO${i}`;
         const pc = document.getElementById(`pc${i}`).value;
         const pl = document.getElementById(`pl${i}`).value;
+        const hoLabel = ho ? `HO${ho}` : `HO${i}`;
 
         if (pc && pl) {
           pcplLines.push(`　${hoLabel}　${pc}／${pl}`);
@@ -263,8 +265,9 @@
         if (pcplLines.length > 0) {
           output += pcplLabel + "\n";
           for (let i = 0; i < pcplLines.length; i++) {
-            const hoNumber = i + 1;
-            output += `　HO${hoNumber}　${pcplLines[i].split('　')[2]}\n`;
+            const hoInput = document.getElementById(`ho${i + 1}`).value;
+            const hoLabel = hoInput ? `HO${hoInput}` : `HO${i + 1}`;
+            output += `　${hoLabel}　${pcplLines[i].split('　')[2]}\n`;
           }
           output += "\n";
         }
