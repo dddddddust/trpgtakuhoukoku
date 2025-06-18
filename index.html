@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>卓報告フォーマットジェネレーター</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    textarea { width: 100%; height: 200px; margin-top: 10px; }
+    .section { margin-bottom: 20px; }
+    .label { display: block; margin-top: 5px; }
+    input[type=text], select { width: 100%; padding: 5px; }
+    .radio-group { margin-top: 5px; }
+    .char-count { font-size: 12px; color: gray; text-align: right; }
+    .char-count.over { color: red; }
+  </style>
+</head>
+<body>
+  <h1>卓報告フォーマットジェネレーター</h1>
+  <div class="section">
+    <label class="label">システム:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="system" value="クトゥルフ神話TRPG">クトゥルフ神話TRPG</label>
+      <label><input type="radio" name="system" value="新クトゥルフ神話TRPG">新クトゥルフ神話TRPG</label>
+      <label><input type="radio" name="system" value="other">その他</label>
+      <input type="text" id="systemOther" placeholder="システム名（「その他」を選択した場合入力します）" disabled>
+    </div>
+  </div>
+
+  <div class="section">
+    <label class="label">シナリオ:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="scenarioFrame" value="「」">「」</label>
+      <label><input type="radio" name="scenarioFrame" value="『』">『』</label>
+      <label><input type="radio" name="scenarioFrame" value="【】">【】</label>
+      <label><input type="radio" name="scenarioFrame" value="──────">──────</label>
+      <label><input type="radio" name="scenarioFrame" value="◤◢">◤　◢</label>
+      <label><input type="radio" name="scenarioFrame" value="╋━━━━━━━━">╋━━━━━━━━</label>
+      <label><input type="radio" name="scenarioFrame" value="＊───────">＊───────</label>
+      <label><input type="radio" name="scenarioFrame" value="••┈┈┈┈">••┈┈┈┈</label>
+      <label><input type="radio" name="scenarioFrame" value="✼••┈┈┈••✼••┈┈┈••✼">✼••┈┈┈••✼••┈┈┈••✼</label>
+      <label><input type="radio" name="scenarioFrame" value="✦⊹">✦ ⊹ ｡ ﾟ˖ ✧ ⊹ ｡ ﾟ⁖ °✦ ⊹ ｡ ﾟ˖ ✧</label>
+      <label><input type="radio" name="scenarioFrame" value="▹▸">▹▸ーーーーーー▹▸</label>
+      <label><input type="radio" name="scenarioFrame" value="＝＝＝＝＝＝">＝＝＝＝＝＝</label>
+      <label><input type="radio" name="scenarioFrame" value="▼△▼△▼△▼△▼△▼△">▼△▼△▼△▼△▼△▼△</label>
+      <label><input type="radio" name="scenarioFrame" value="☆.｡:･★.｡:*･">☆.｡:･★.｡:*･</label>
+      <label><input type="radio" name="scenarioFrame" value="o○o。.。o○o。.。o○o">o○o。.。o○o。.。o○o</label>
+      <label><input type="radio" name="scenarioFrame" value="⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒">⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒</label>
+      <label><input type="radio" name="scenarioFrame" value="ଘ♡ଓ*:゚+｡.໒꒱°*ଘ♡ଓ">ଘ♡ଓ*:゚+｡.໒꒱°*ଘ♡ଓ</label>
+    </div>
+    <input type="text" id="scenarioName" placeholder="シナリオ名">
+  </div>
+
+  <div class="section">
+    <label class="label">進行:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="role" value="KP">KP</label>
+      <label><input type="radio" name="role" value="GM">GM</label>
+      <label><input type="radio" name="role" value="other">その他</label>
+      <input type="text" id="roleOther" placeholder="進行役名（「その他」を選択した場合入力します）" disabled>
+    </div>
+    <input type="text" id="roleName" placeholder="進行ハンドルネーム">
+  </div>
+
+  <div class="section">
+    <label class="label">PC/HO/PL（最大4人まで）:</label>
+    <div id="players"></div>
+  </div>
+
+  <div class="section">
+    <label class="label">エンド名:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="ending" value="END1">END1</label>
+      <label><input type="radio" name="ending" value="END2">END2</label>
+      <label><input type="radio" name="ending" value="END3">END3</label>
+      <label><input type="radio" name="ending" value="END A">END A</label>
+      <label><input type="radio" name="ending" value="END B">END B</label>
+      <label><input type="radio" name="ending" value="END C">END C</label>
+      <label><input type="radio" name="ending" value="other">その他</label>
+      <input type="text" id="endingOther" placeholder="エンド名（「その他」を選択した場合入力します）" disabled>
+    </div>
+  </div>
+
+  <div class="section">
+    <label class="label">フォント:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="font" value="unicode">ℙℂ／ℙ𝕃</label>
+      <label><input type="radio" name="font" value="square">🅟🅒／🅟🅛</label>
+      <label><input type="radio" name="font" value="bold">𝙋𝘾／𝙋𝙇</label>
+      <label><input type="radio" name="font" value="small">ᴘᴄ／ᴘʟ</label>
+      <label><input type="radio" name="font" value="circled">🅿🅲／🅿🅻</label>
+      <label><input type="radio" name="font" value="serif">𝙿𝙲／𝙿𝙻</label>
+      <label><input type="radio" name="font" value="script">𝓟𝓒／𝓟𝓛</label>
+      <label><input type="radio" name="font" value="superscript">ᴾᶜ／ᴾᴸ</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <label class="label">生還・ロスト:</label>
+    <div class="radio-group">
+      <label><input type="radio" name="result" value="両生還">両生還</label>
+      <label><input type="radio" name="result" value="全生還">全生還</label>
+      <label><input type="radio" name="result" value="両ロスト">両ロスト</label>
+      <label><input type="radio" name="result" value="全ロスト">全ロスト</label>
+      <label><input type="radio" name="result" value="other">その他</label>
+      <input type="text" id="resultOther" placeholder="結果詳細（「その他」を選択した場合入力します）" disabled>
+    </div>
+  </div>
+
+  <div class="section">
+    <label class="label">コメント:</label>
+    <input type="text" id="comment" placeholder="感想やコメント">
+  </div>
+
+  <button onclick="generate()">生成</button>
+
+  <textarea id="output" readonly></textarea>
+  <div id="charCount" class="char-count">文字数：0字</div>
+
+  <script>
+    const playersDiv = document.getElementById('players');
+    for (let i = 1; i <= 4; i++) {
+      playersDiv.innerHTML += `
+        <div class="player">
+          <label class="label">PC${i}：</label><input type="text" id="pc${i}">
+          <label class="label">HO${i}：</label><input type="text" id="ho${i}">
+          <label class="label">PL${i}：</label><input type="text" id="pl${i}">
+        </div><br>`;
+    }
+
+    ['system', 'role', 'ending', 'result'].forEach(name => {
+      document.querySelectorAll(`input[name=${name}]`).forEach(r => {
+        r.addEventListener('change', () => {
+          document.getElementById(name + 'Other').disabled = r.value !== 'other';
+        });
+      });
+    });
+
+    function decorateScenario(frame, name) {
+      switch (frame) {
+        case '「」': return `　　「${name}」`;
+        case '『』': return `　　『${name}』`;
+        case '【】': return `　　【${name}】`;
+        case '──────': return `────────────────────\n　　${name}\n────────────────────`;
+        case '◤◢': return `　　◤　${name}　◢`;
+        case '╋━━━━━━━━': return `╋━━━━━━━━\n　　${name}\n　　　　　　━━━━━━━━╋`;
+        case '＊───────': return `＊───────\n　　${name}\n　　　　　　───────＊`;
+        case '••┈┈┈┈': return `••┈┈┈┈\n　　${name}\n　　　　　　　　┈┈┈┈••`;
+        case '✼••┈┈┈••✼••┈┈┈••✼': return `　　✼••┈┈┈••✼••┈┈┈••✼\n　　　${name}\n　　✼••┈┈┈••✼••┈┈┈••✼`;
+        case '✦⊹': return `　　✦ ⊹ ｡ ﾟ˖ ✧ ⊹ ｡ ﾟ⁖ °✦ ⊹ ｡ ﾟ˖ ✧\n　　　${name}\n　　✦ ⊹ ｡ ﾟ˖ ✧ ⊹ ｡ ﾟ⁖ °✦ ⊹ ｡ ﾟ˖ ✧`;
+        case '▹▸': return `　　▹▸ーーーーーーーーーー▹▸\n　　　${name}\n　　▹▸ーーーーーーーーーー▹▸`;
+        case '＝＝＝＝＝＝': return `　　＝＝＝＝＝＝＝＝＝\n　　　${name}\n　　＝＝＝＝＝＝＝＝＝`;
+        case '▼△▼△▼△▼△▼△▼△': return `　　▼△▼△▼△▼△▼△▼△▼△▼\n　　　${name}\n　　▼△▼△▼△▼△▼△▼△▼△▼`;
+        case '☆.｡:･★.｡:*･': return `　　☆.｡:･★.｡:*･☆.｡:*･\n　　　${name}\n　　｡:*･★.｡:*･☆.｡☆.｡`;
+        case 'o○o。.。o○o。.。o○o': return `　　o○o。.。o○o。.。o○o\n　　　${name}\n　　o○o。.。o○o。.。o○o`;
+        case '⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒': return `　　⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒\n　　　${name}\n　　⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒⌒`;
+        case 'ଘ♡ଓ*:゚+｡.໒꒱°*ଘ♡ଓ': return `　　ଘ♡ଓ*:゚+｡.໒꒱°*ଘ♡ଓ\n　　　${name}\n　　ଘ♡ଓ*:゚+｡.໒꒱°*ଘ♡ଓ`;
+        default: return name;
+      }
+    }
+
+    function transformText(text, font) {
+      switch (font) {
+        case 'unicode':
+          return text.replace(/KP/g, '𝕂ℙ').replace(/GM/g, '𝔾𝕄').replace(/PC/g, 'ℙℂ').replace(/PL/g, 'ℙ𝕃').replace(/HO(\d)/g, 'ℍ𝕆$1').replace(/(\d)/g, (match, digit) => {
+            const unicodeDigits = ['𝟘', '𝟙', '𝟚', '𝟛', '𝟜', '𝟝', '𝟞', '𝟟', '𝟠', '𝟡'];
+            return unicodeDigits[parseInt(digit)];
+          });
+        case 'square':
+          return text.replace(/KP/g, '🅚🅟').replace(/GM/g, '🅖🅜').replace(/PC/g, '🅟🅒').replace(/PL/g, '🅟🅛').replace(/HO(\d)/g, '🅗🅞$1').replace(/(\d)/g, (match, digit) => {
+            const circledDigits = ['⓪', '❶', '❷', '❸', '❹', '❺', '❻', '❼', '❽', '❾'];
+            return circledDigits[parseInt(digit)];
+          });
+        case 'bold':
+          return text.replace(/KP/g, '𝙆𝙋').replace(/GM/g, '𝙂𝙈').replace(/PC/g, '𝙋𝘾').replace(/PL/g, '𝙋𝙇').replace(/HO(\d)/g, '𝙃𝙊$1');
+        case 'small':
+          return text.replace(/KP/g, 'ᴋᴘ').replace(/GM/g, 'ɢᴍ').replace(/PC/g, 'ᴘᴄ').replace(/PL/g, 'ᴘʟ').replace(/HO(\d)/g, 'ʜᴏ$1').replace(/(\d)/g, (match, digit) => {
+            const smallDigits = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']; // これはHOの添え字には適さないので、一旦そのまま
+            return digit;
+          });
+        case 'circled':
+          return text.replace(/KP/g, '🅺🅿').replace(/GM/g, '🅶🅼').replace(/PC/g, '🅿🅲').replace(/PL/g, '🅿🅻').replace(/HO(\d)/g, '🅷🅾$1').replace(/(\d)/g, (match, digit) => {
+            const enclosedDigits = ['0⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣'];
+            return enclosedDigits[parseInt(digit)];
+          });
+        case 'serif':
+          return text.replace(/KP/g, '𝙺𝙿').replace(/GM/g, '𝙶𝙼').replace(/PC/g, '𝙿𝙲').replace(/PL/g, '𝙿𝙻').replace(/HO(\d)/g, '𝙷𝙾$1').replace(/(\d)/g, (match, digit) => {
+            const serifDigits = ['𝟶', '𝟷', '𝟸', '𝟹', '𝟺', '𝟻', '𝟼', '𝟽', '𝟾', '𝟿'];
+            return serifDigits[parseInt(digit)];
+          });
+        case 'script':
+          return text.replace(/KP/g, '𝓚𝓟').replace(/GM/g, '𝓖𝓜').replace(/PC/g, '𝓟𝓒').replace(/PL/g, '𝓟𝓛').replace(/HO(\d)/g, '𝓗𝓞$1').replace(/(\d)/g, (match, digit) => {
+            const scriptDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']; // スクリプト体の数字は種類が少ないため、一旦そのまま
+            return scriptDigits[parseInt(digit)];
+          });
+        case 'superscript':
+          return text.replace(/KP/g, 'ᴷᴾ').replace(/GM/g, 'ᴳᴹ').replace(/PC/g, 'ᴾᶜ').replace(/PL/g, 'ᴾᴸ').replace(/HO(\d)/g, 'ᴴᴼ$1').replace(/(\d)/g, (match, digit) => {
+            const superscriptDigits = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+            return superscriptDigits[parseInt(digit)];
+          });
+        default:
+          return text;
+      }
+    }
+
+    function generate() {
+      const system = document.querySelector('input[name=system]:checked')?.value;
+      const systemText = system === 'other' ? document.getElementById('systemOther').value : system || '';
+      const scenarioFrame = document.querySelector('input[name=scenarioFrame]:checked')?.value || '';
+      const scenarioName = document.getElementById('scenarioName').value || '';
+      const roleType = document.querySelector('input[name=role]:checked')?.value;
+      const roleLabel = roleType === 'other' ? document.getElementById('roleOther').value : roleType || '';
+      const roleName = document.getElementById('roleName').value;
+      const font = document.querySelector('input[name=font]:checked')?.value || 'normal';
+
+      let output = '';
+      if (systemText) output += systemText + "\n";
+      if (scenarioName) output += decorateScenario(scenarioFrame, scenarioName) + "\n\n";
+
+      let roleOutput = `${roleLabel}：${roleName}`;
+      roleOutput = transformText(roleOutput, font);
+      if (roleLabel && roleName) output += `${roleOutput}\n\n`;
+
+      let pcLines = [];
+      let plLines = [];
+      let pcplLines = [];
+
+      for (let i = 1; i <= 4; i++) {
+        const ho = document.getElementById(`ho${i}`).value;
+        const hoLabel = ho ? `HO${ho}` : `HO${i}`;
+        const pc = document.getElementById(`pc${i}`).value;
+        const pl = document.getElementById(`pl${i}`).value;
+
+        if (pc && pl) {
+          pcplLines.push(`　${hoLabel}　${pc}／${pl}`);
+        } else if (pc) {
+          pcLines.push(`　${hoLabel}　${pc}`);
+        } else if (pl) {
+          plLines.push(`　${hoLabel}　${pl}`);
+        }
+      }
+
+      let pcplLabel = "PC／PL：";
+      let pcLabel = "PC：";
+      let plLabel = "PL：";
+
+      pcplLabel = transformText(pcplLabel, font);
+      pcLabel = transformText(pcLabel, font);
+      plLabel = transformText(plLabel, font);
+
+      for (let i = 0; i < pcplLines.length; i++) {
+        pcplLines[i] = transformText(pcplLines[i], font);
+      }
+      for (let i = 0; i < pcLines.length; i++) {
+        pcLines[i] = transformText(pcLines[i], font);
+      }
+      for (let i = 0; i < plLines.length; i++) {
+        plLines[i] = transformText(plLines[i], font);
+      }
+
+      if (pcplLines.length > 0) {
+        output += pcplLabel + "\n";
+        output += pcplLines.join("\n") + "\n";
+      }
+
+      if (pcLines.length > 0) {
+        output += pcLabel + "\n";
+        output += pcLines.join("\n") + "\n";
+      }
+
+      if (plLines.length > 0) {
+        output += plLabel + "\n";
+        output += plLines.join("\n") + "\n";
+      }
+
+      const ending = document.querySelector('input[name=ending]:checked')?.value;
+      const endingText = ending === 'other' ? document.getElementById('endingOther').value : ending || '';
+      const result = document.querySelector('input[name=result]:checked')?.value;
+      const resultText = result === 'other' ? document.getElementById('resultOther').value : result || '';
+
+      if (endingText || resultText) {
+        output += "\n";
+        if (endingText) output += endingText + "\n";
+        if (resultText) output += `　　──${resultText}にてシナリオ終了\n`;
+        else if (endingText) output += `　　──${endingText}にてシナリオ終了\n`;
+      }
+
+      const comment = document.getElementById('comment').value;
+      if (comment) output += `\n${comment}`;
+
+      document.getElementById('output').value = output;
+
+      const count = output.length;
+      const countElem = document.getElementById('charCount');
+      countElem.textContent = `文字数：${count}字`;
+      countElem.className = count > 140 ? 'char-count over' : 'char-count';
+    }
+  </script>
+</body>
+</html>
