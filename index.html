@@ -63,6 +63,9 @@
 
   <div class="section">
     <label class="label">PC/HO/PL（最大4人まで）:</label>
+    <div class="radio-group">
+      <label><input type="checkbox" id="noHO">HOを入力しない</label>
+    </div>
     <div id="players"></div>
   </div>
 
@@ -119,14 +122,30 @@
 
   <script>
     const playersDiv = document.getElementById('players');
-    for (let i = 1; i <= 4; i++) {
-      playersDiv.innerHTML += `
-        <div class="player">
-          <label class="label">PC${i}：</label><input type="text" id="pc${i}">
-          <label class="label">HO${i}：</label><input type="text" id="ho${i}">
-          <label class="label">PL${i}：</label><input type="text" id="pl${i}">
-        </div><br>`;
+    let noHO = document.getElementById('noHO').checked;
+
+    function updatePlayerFields() {
+      playersDiv.innerHTML = '';
+      noHO = document.getElementById('noHO').checked;
+
+      for (let i = 1; i <= 4; i++) {
+        let hoInput = `<label class="label">HO${i}：</label><input type="text" id="ho${i}" ${noHO ? 'disabled' : ''}>`;
+        if (noHO) {
+          hoInput = '';
+        }
+        playersDiv.innerHTML += `
+          <div class="player">
+            ${hoInput}
+            <label class="label">PC${i}：</label><input type="text" id="pc${i}">
+            <label class="label">PL${i}：</label><input type="text" id="pl${i}">
+          </div><br>`;
+      }
     }
+
+    updatePlayerFields(); // 初期化
+
+    document.getElementById('noHO').addEventListener('change', updatePlayerFields);
+
 
     ['system', 'role', 'ending', 'result'].forEach(name => {
       document.querySelectorAll(`input[name=${name}]`).forEach(r => {
@@ -139,7 +158,8 @@
     function decorateScenario(frame, name) {
       switch (frame) {
         case '「」': return `　　「${name}」`;
-        case '『』': return `　　【${name}】`;
+        case '『』': return `　　『${name}』`;
+        case '【】': return `　　【${name}】`;
         case '──────': return `────────────────────\n　　${name}\n────────────────────`;
         case '◤◢': return `　　◤　${name}　◢`;
         case '╋━━━━━━━━': return `╋━━━━━━━━\n　　${name}\n　　　　　　━━━━━━━━╋`;
@@ -210,6 +230,7 @@
       const roleLabel = roleType === 'other' ? document.getElementById('roleOther').value : roleType || '';
       const roleName = document.getElementById('roleName').value;
       const font = document.querySelector('input[name=font]:checked')?.value || 'normal';
+      const noHO = document.getElementById('noHO').checked;
 
       let output = '';
       if (systemText) output += systemText + "\n";
@@ -225,19 +246,31 @@
       let pcLines = [];
       let plLines = [];
       let pcplLines = [];
+      let pcOnlyLines = [];
+      let plOnlyLines = [];
 
       for (let i = 1; i <= 4; i++) {
-        const ho = document.getElementById(`ho${i}`).value;
+        const ho = document.getElementById(`ho${i}`)?.value || '';
         const pc = document.getElementById(`pc${i}`).value;
         const pl = document.getElementById(`pl${i}`).value;
         const hoLabel = ho ? `HO${ho}` : `HO${i}`;
 
-        if (pc && pl) {
-          pcplLines.push(`　${hoLabel}　${pc}／${pl}`);
-        } else if (pc) {
-          pcLines.push(`　${hoLabel}　${pc}`);
-        } else if (pl) {
-          plLines.push(`　${hoLabel}　${pl}`);
+        if (!noHO) {
+          if (pc && pl) {
+            pcplLines.push(`　${hoLabel}　${pc}／${pl}`);
+          } else if (pc) {
+            pcLines.push(`　${hoLabel}　${pc}`);
+          } else if (pl) {
+            plLines.push(`　${hoLabel}　${pl}`);
+          }
+        } else {
+          if (pc && pl) {
+            pcplLines.push(`　${pc}／${pl}`);
+          } else if (pc) {
+            pcOnlyLines.push(`　${pc}`);
+          } else if (pl) {
+            plOnlyLines.push(`　${pl}`);
+          }
         }
       }
 
@@ -259,17 +292,61 @@
         for (let i = 0; i < plLines.length; i++) {
           plLines[i] = transformText(plLines[i], font);
         }
+        for (let i = 0; i < pcOnlyLines.length; i++) {
+          pcOnlyLines[i] = transformText(pcOnlyLines[i], font);
+        }
+        for (let i = 0; i < plOnlyLines.length; i++) {
+          plOnlyLines[i] = transformText(plOnlyLines[i], font);
+        }
       }
 
-      if (font === 'normal') {
-        if (pcplLines.length > 0) {
-          output += pcplLabel + "\n";
-          for (let i = 0; i < pcplLines.length; i++) {
-            const hoInput = document.getElementById(`ho${i + 1}`).value;
-            const hoLabel = hoInput ? `HO${hoInput}` : `HO${i + 1}`;
-            output += `　${hoLabel}　${pcplLines[i].split('　')[2]}\n`;
+      if (!noHO) {
+        if (font === 'normal') {
+          let hasOutput = false;
+          for (let i = 0; i < 4; i++) {
+            const pc = document.getElementById(`pc${i + 1}`).value;
+            const pl = document.getElementById(`pl${i + 1}`).value;
+            const ho = document.getElementById(`ho${i + 1}`)?.value || '';
+            const hoLabel = ho ? `HO${ho}` : `HO${i + 1}`;
+
+            if (pc && pl) {
+              if (!hasOutput) {
+                output += pcplLabel + "\n";
+                hasOutput = true;
+              }
+              output += `　${hoLabel}　${pc}／${pl}\n`;
+            } else if (pc) {
+              if (!hasOutput) {
+                output += pcLabel + "\n";
+                hasOutput = true;
+              }
+              output += `　${hoLabel}　${pc}\n`;
+            } else if (pl) {
+              if (!hasOutput) {
+                output += plLabel + "\n";
+                hasOutput = true;
+              }
+              output += `　${hoLabel}　${pl}\n`;
+            }
           }
-          output += "\n";
+          if (hasOutput) {
+            output += "\n";
+          }
+        } else {
+          if (pcplLines.length > 0) {
+            output += pcplLabel + "\n";
+            output += pcplLines.join("\n") + "\n";
+          }
+
+          if (pcLines.length > 0) {
+            output += pcLabel + "\n";
+            output += pcLines.join("\n") + "\n";
+          }
+
+          if (plLines.length > 0) {
+            output += plLabel + "\n";
+            output += plLines.join("\n") + "\n";
+          }
         }
       } else {
         if (pcplLines.length > 0) {
@@ -277,14 +354,14 @@
           output += pcplLines.join("\n") + "\n";
         }
 
-        if (pcLines.length > 0) {
+        if (pcOnlyLines.length > 0) {
           output += pcLabel + "\n";
-          output += pcLines.join("\n") + "\n";
+          output += pcOnlyLines.join("\n") + "\n";
         }
 
-        if (plLines.length > 0) {
+        if (plOnlyLines.length > 0) {
           output += plLabel + "\n";
-          output += plLines.join("\n") + "\n";
+          output += plOnlyLines.join("\n") + "\n";
         }
       }
 
